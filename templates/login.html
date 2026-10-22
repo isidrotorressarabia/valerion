@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Acceso privado · Valerion{% endblock %}
+{% block scripts %}<script defer src="/static/js/login.js"></script>{% endblock %}
+{% block body_class %}login-page{% endblock %}
+{% block body %}
+<main id="main" class="login-layout"><div class="login-brand"><a class="wordmark" href="/">VALERION<span>MEZCAL</span></a><div><p class="eyebrow">EL UNIVERSO VALERION</p><h1>Una marca con<br><em>carácter propio.</em></h1><p>Cuida cada detalle de tu colección.</p></div><a href="/" class="text-link">← Volver al sitio</a></div><div class="login-form-area"><form id="login-form" class="login-form"><p class="eyebrow">ACCESO PRIVADO</p><h2>Bienvenido de nuevo.</h2><p class="muted">Ingresa para administrar el catálogo de Valerion.</p><label for="usuario">Usuario</label><input id="usuario" name="usuario" autocomplete="username" required maxlength="100" autofocus><label for="password">Contraseña</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button type="button" id="show-password" aria-label="Mostrar contraseña" aria-pressed="false">Ver</button></div><p id="login-error" class="notice error" role="alert" hidden></p><button id="login-submit" class="button full" type="submit">Entrar al panel <span aria-hidden="true">→</span></button><p class="small muted">Acceso exclusivo para administración.</p></form></div></main>
+{% endblock %}

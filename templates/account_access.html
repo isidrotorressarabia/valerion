@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Crear cuenta' if register else 'Iniciar sesión' }} · Valerion{% endblock %}
+{% block scripts %}<script defer src="/static/js/public.js"></script><script defer src="/static/js/account.js"></script>{% endblock %}
+{% block body %}{% include 'public_header.html' %}
+<main id="main" class="wrap account-wrap"><section class="account-card"><p class="eyebrow">TU ESPACIO VALERION</p><h1>{{ 'Crea tu cuenta' if register else 'Bienvenido de nuevo' }}</h1><p>Administra tu perfil y tus preferencias de contacto.</p>
+<form id="access-form" data-register="{{ 'true' if register else 'false' }}">
+{% if register %}<label>Nombre<input name="nombre" autocomplete="name" required minlength="2" maxlength="100"></label>{% endif %}
+<label>Correo electrónico<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+<label>Contraseña<input name="password" type="password" autocomplete="{{ 'new-password' if register else 'current-password' }}" required minlength="{{ 12 if register else 1 }}" maxlength="256"></label>
+{% if register %}<p class="small muted">Utiliza al menos 12 caracteres. Puedes pegar una contraseña desde tu gestor.</p>{% endif %}
+<button class="button">{{ 'Crear cuenta' if register else 'Entrar' }}</button><p id="account-message" role="status" aria-live="polite"></p>
+</form><p><a href="{{ '/cuenta/login' if register else '/cuenta/registro' }}">{{ 'Ya tengo cuenta' if register else 'Crear una cuenta' }} →</a></p></section></main>{% include 'public_footer.html' %}{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Contenido del sitio · Valerion{% endblock %}
+{% block scripts %}<script defer src="/static/js/content.js"></script>{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block body %}
+<aside class="admin-sidebar"><a href="/" class="wordmark">{{ c.brand_name }}<span>ADMINISTRACIÓN</span></a><p class="eyebrow">ADMINISTRACIÓN</p><a href="/admin">▦ Catálogo</a><a href="/admin/contenido" class="sidebar-active" aria-current="page">✎ Contenido del sitio</a><a href="/admin/estudio">◈ Diseño y contacto</a><a href="/admin/sistema">◉ Sistema y respaldos</a><a href="/" target="_blank" rel="noopener">Ver sitio web ↗</a><div class="sidebar-bottom"><div class="avatar">V</div><div><strong>{{ username }}</strong><small>Administrador</small></div><button id="content-logout" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button></div></aside>
+<main id="main" class="admin-main"><header class="admin-topline"><span>Administración / <strong>Contenido del sitio</strong></span><a href="/" target="_blank" rel="noopener">Ver cambios en el sitio ↗</a></header><nav class="admin-mobile-nav" aria-label="Secciones de administración"><a href="/admin/clientes">Clientes</a><a href="/admin">Catálogo</a><a href="/admin/contenido" aria-current="page">Contenido del sitio</a><a href="/admin/estudio">Diseño y contacto</a><a href="/admin/sistema">Sistema</a></nav><div class="admin-heading"><div><p class="eyebrow">PERSONALIZA TU MARCA</p><h1>Contenido del sitio</h1><p class="muted">Modifica textos e imágenes sin editar código.</p></div><a class="button secondary" href="/" target="_blank" rel="noopener">Vista del cliente ↗</a></div>
+<p class="notice">Abre una sección, realiza tus cambios y presiona «Guardar cambios». Esta pantalla publica los textos e imágenes base inmediatamente; el editor de diseño tiene su propio borrador. Para imágenes puedes seleccionar un archivo de tu equipo o usar una URL.</p>
+<form id="content-form"><p id="content-error" class="notice error" role="alert" hidden></p>
+{% for section, section_fields in fields|groupby('section') %}
+<details class="content-section" {% if section in ['Imágenes del sitio', 'Esencia, misión y visión'] %}open{% endif %}><summary>{{ section }} <span>{{ section_fields|length }} campos</span></summary><div class="content-fields">
+{% for field in section_fields %}
+<div class="content-field {% if field.type == 'image' %}content-image-field{% endif %}"><label for="content-{{ field.key }}">{{ field.label }}{% if not field.optional %} <span>*</span>{% endif %}</label>
+{% if field.type == 'image' %}
+<div class="content-image-editor"><img src="{{ c[field.key] }}" id="image-{{ field.key }}" alt="Vista previa de {{ field.label }}" data-fallback width="250" height="180"><div><label class="upload-label" for="upload-{{ field.key }}">Subir desde mi equipo</label><input id="upload-{{ field.key }}" type="file" accept="image/jpeg,image/png,image/webp" data-upload-target="{{ field.key }}" disabled><p class="field-help">JPG, PNG o WebP · máximo 8 MB.</p><label for="content-{{ field.key }}">O usar una URL / imagen cargada</label><input id="content-{{ field.key }}" data-content-key="{{ field.key }}" data-image-field type="text" value="{{ c[field.key] }}" maxlength="2083" required><p id="status-{{ field.key }}" class="upload-status" role="status" aria-live="polite"></p></div></div>
+{% else %}
+<textarea id="content-{{ field.key }}" data-content-key="{{ field.key }}" rows="{% if field.key in ['mission','vision','description'] %}5{% else %}2{% endif %}" maxlength="4000" {% if not field.optional %}required{% endif %}>{{ c[field.key] }}</textarea>
+{% endif %}</div>
+{% endfor %}
+</div></details>
+{% endfor %}
+<div class="content-save-bar"><span id="content-save-status" role="status" aria-live="polite">Sin cambios pendientes.</span><button class="button" id="content-save" type="submit" disabled>Guardar cambios</button></div></form>
+</main>
+{% endblock %}

@@ -1,0 +1,12 @@
+<section class="collection wrap section" id="coleccion" aria-labelledby="collection-title">
+    <div class="section-heading"><div><p class="eyebrow">{{ c.collection_eyebrow }}</p><h2 id="collection-title">{{ c.collection_title }}<br><em>{{ c.collection_title_em }}</em></h2></div><p>{{ c.collection_intro }}</p></div>
+    <div class="catalog-toolbar"><label class="category-filter">Categoría<select id="catalog-category"><option value="">Todas</option>{% for category in categories %}{% if category %}<option>{{ category }}</option>{% endif %}{% endfor %}</select></label><label class="search-field"><span aria-hidden="true">⌕</span><input type="search" id="catalog-search" placeholder="Buscar en la colección" aria-label="Buscar mezcal" maxlength="100"></label><div class="sort-field"><label for="catalog-sort">Ordenar por</label><select id="catalog-sort"><option value="destacados">Destacados</option><option value="precio_asc">Menor precio</option><option value="precio_desc">Mayor precio</option><option value="nombre">Nombre</option><option value="recientes">Novedades</option></select></div></div>
+    <p id="catalog-status" class="sr-only" role="status" aria-live="polite">{{ products|length }} mezcales</p>
+    <div class="product-grid" id="product-grid" data-label="{{ c.collection_label }}" data-discover="{{ c.collection_discover }}" data-image-note="{{ c.collection_image_note }}" data-bottle="{{ c.bottle_image }}">
+{% for product in products %}{% include 'product_card.html' %}{% endfor %}
+    </div>
+    <div id="catalog-empty" class="empty-state" {% if products %}hidden{% endif %}><h3>{{ c.collection_empty_title }}</h3><p>{{ c.collection_empty_desc }}</p><button class="button secondary" id="reset-search">{{ c.collection_reset }}</button></div>
+    <div id="catalog-error" class="notice error" role="alert" hidden>No pudimos actualizar la colección. <button id="retry-catalog" class="text-link">Volver a intentar</button></div>
+    <nav class="pagination" aria-label="Páginas del catálogo"><button id="catalog-prev" class="button secondary" disabled>← Anterior</button><span id="catalog-page" role="status">Página 1 de {{ catalog.pages }} · {{ catalog.total }} productos</span><button id="catalog-next" class="button secondary" {% if catalog.pages <= 1 %}disabled{% endif %}>Siguiente →</button></nav>
+    {% if c.catalog_note %}<p class="catalog-note">{{ c.catalog_note }}</p>{% endif %}
+  </section>

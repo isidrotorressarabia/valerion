@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: valerion
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*' --limit-concurrency 64 --timeout-keep-alive 5 --no-access-log --log-config logging.json
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.12
+      - key: APP_ENV
+        value: production
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: CLOUDINARY_FOLDER
+        value: valerion_catalogo
+      - key: DB_POOL_MAX
+        value: "5"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: SEED_DEMO
+        value: "false"

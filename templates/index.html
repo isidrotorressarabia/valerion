@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block scripts %}<script defer src="/static/js/catalog.js"></script><script defer src="/static/js/public.js"></script>{% endblock %}
+{% block body %}
+{% include 'public_header.html' %}
+<main id="main">{% for s in sections %}
+{% if s.kind in ['hero','values','catalog','essence','ritual','closing'] %}{% include 'section_' ~ s.kind ~ '.html' %}
+{% elif s.kind == 'contact' %}{% include 'contact.html' %}
+{% else %}{% include 'custom_section.html' %}{% endif %}
+{% endfor %}</main>
+{% include 'public_footer.html' %}{% include 'age.html' %}
+{% endblock %}

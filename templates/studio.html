@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Diseño y contacto · Valerion{% endblock %}
+{% block scripts %}<script defer src="/static/js/editor-kit.js"></script><script defer src="/static/js/studio.js"></script>{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block body %}
+<aside class="admin-sidebar"><a class="wordmark" href="/">{{ c.brand_name }}<span>ADMINISTRACIÓN</span></a><p class="eyebrow">TU MARCA</p><a href="/admin">▦ Catálogo</a><a href="/admin/clientes">Clientes</a><a href="/admin/contenido">✎ Textos e imágenes base</a><a href="/admin/estudio" class="sidebar-active" aria-current="page">◈ Diseño y contacto</a><a href="/admin/sistema">◉ Sistema y respaldos</a><a href="/" target="_blank" rel="noopener">Ver sitio web ↗</a><div class="sidebar-bottom"><div class="avatar">V</div><div><strong>{{ username }}</strong><small>Administrador</small></div><button id="studio-logout" aria-label="Cerrar sesión">↪</button></div></aside>
+<main id="main" class="admin-main"><header class="admin-topline"><span>Administración / <strong>Diseño y contacto</strong></span><a href="/admin/preview" target="_blank" rel="noopener">Vista previa del borrador ↗</a></header><nav class="admin-mobile-nav"><a href="/admin">Catálogo</a><a href="/admin/contenido">Textos base</a><a href="/api/admin/respaldo" download>Respaldo</a><a href="/admin/sistema">Sistema</a></nav>
+<div class="admin-heading"><div><p class="eyebrow">TU IDENTIDAD, A TU MANERA</p><h1>Diseña tu experiencia.</h1><p class="muted">Construye nuevas secciones, personaliza el estilo y conecta con tus clientes.</p></div></div>
+<div class="studio-tabs" role="tablist" aria-label="Editor"><button role="tab" aria-selected="true" data-tab="sections">01 · Secciones</button><button role="tab" aria-selected="false" data-tab="theme">02 · Apariencia</button><button role="tab" aria-selected="false" data-tab="contact">03 · Contacto y redes</button><button role="tab" aria-selected="false" data-tab="history">04 · Historial</button></div>
+<p id="studio-error" class="notice error" role="alert" hidden></p><div id="studio-editor" role="tabpanel"><p class="notice">Cargando tu espacio de edición…</p></div>
+<div class="studio-save-bar"><div><strong id="studio-status" role="status" aria-live="polite">Cargando…</strong><small>Guardar borrador no cambia el sitio público.</small></div><button class="button secondary" id="studio-save" disabled>Guardar borrador</button><button class="button" id="studio-publish" disabled>Publicar cambios ↗</button></div>
+</main>{% endblock %}

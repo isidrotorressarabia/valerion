@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#183d32">
+  <meta name="description" content="{{ product.descripcion if product is defined else c.meta_description }}">
+  {% if studio is defined and not preview %}
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ product.nombre ~ ' · ' ~ c.brand_name if product is defined else c.page_title }}">
+  <meta property="og:description" content="{{ product.descripcion if product is defined else c.meta_description }}">
+  <meta property="og:url" content="{{ request.url }}">
+  {% set cover = product.imagen_url if product is defined else c.hero_image %}
+  <meta property="og:image" content="{{ request.base_url|string|trim('/') ~ cover if cover.startswith('/') else cover }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="{{ request.url }}">
+  {% else %}<meta name="robots" content="noindex,nofollow">{% endif %}
+  <title>{% block title %}{{ c.page_title }}{% endblock %}</title>
+  <link rel="icon" href="{{ c.logo_image }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+  <script defer src="{{ url_for('static', path='js/shared.js') }}"></script>
+  <link rel="stylesheet" href="/static/css/enhancements.css">
+  {% if studio is defined %}<link rel="stylesheet" href="/theme.css{% if preview %}?draft=true{% endif %}">{% endif %}
+  {% block scripts %}{% endblock %}
+</head>
+<body data-fallback-image="{{ c.fallback_image }}" class="{% block body_class %}{% endblock %}">
+<a class="skip-link" href="#main">Saltar al contenido</a>
+{% block body %}{% endblock %}
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

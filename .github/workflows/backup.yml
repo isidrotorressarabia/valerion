@@ -1,0 +1,40 @@
+name: Respaldo manual privado
+on:
+  workflow_dispatch:
+    inputs:
+      imagenes:
+        description: Incluir archivos de Cloudinary
+        required: true
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  backup:
+    if: github.event.repository.private == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production-backup
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Exportar
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
+          INCLUIR_IMAGENES: ${{ inputs.imagenes }}
+        run: |
+          if [ "$INCLUIR_IMAGENES" = "true" ]; then
+            python respaldar.py respaldo.zip --imagenes
+          else
+            python respaldar.py respaldo.zip
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: respaldo-valerion
+          path: respaldo.zip
+          retention-days: 7
+          if-no-files-found: error
