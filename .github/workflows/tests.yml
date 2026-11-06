@@ -1,0 +1,47 @@
+name: Verificar Valerion
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: valerion_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:test-only-password@localhost:5432/valerion_test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python scripts/build_assets.py && git diff --exit-code -- static/build
+      - run: python scripts/verificar_entrega.py
+      - run: python -m pytest -q
+      - run: python -m compileall -q main.py accounts.py infrastructure.py migrations.py media_store.py backups.py maintenance.py respaldar.py restaurar.py cms.py content.py
+      - run: pip install pip-audit && pip-audit -r requirements-cloud.lock --no-deps --disable-pip
+      - run: docker build -t valerion:ci .
+      - name: Verificar contenedor
+        shell: bash
+        run: |
+          export DELIVERY_KEYS="ci:$(python -c 'import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())')"
+          docker run -d --rm --network host --name valerion-ci -e DELIVERY_KEYS -e DATABASE_URL="$TEST_DATABASE_URL" \
+            -e CLOUDINARY_URL=cloudinary://test:test@demo -e ADMIN_PASSWORD=solo-pruebas-ci-2026 \
+            -e PUBLIC_BASE_URL=http://127.0.0.1:8080 valerion:ci
+          curl --retry 15 --retry-all-errors --retry-delay 1 --fail http://127.0.0.1:8080/ready
+          docker stop valerion-ci

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+
+<head>
+  <meta name="google-site-verification" content="XTaLw7224QSRUjnIqzyavP4W_TQeWzOSzySqNJeJrqw" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#183d32">
+
+  {% if seo %}
+  <meta name="description" content="{{ seo.description }}">
+  <meta property="og:type" content="{{ 'product' if product is defined else 'website' }}">
+  <meta property="og:title" content="{{ seo.title }}">
+  <meta property="og:description" content="{{ seo.description }}">
+  <meta property="og:url" content="{{ seo.canonical }}">
+  <meta property="og:image" content="{{ seo.image }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="{{ seo.canonical }}">
+  <script type="application/ld+json">{{ seo.graph|tojson }}</script>
+  {% else %}<meta name="robots" content="noindex,nofollow">{% endif %}
+
+  <title>{% block title %}{{ c.page_title }}{% endblock %}</title>
+
+  <link rel="icon" href="{{ c.logo_image }}">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+  <script defer src="{{ asset('js/shared.js') }}"></script>
+
+  <link rel="stylesheet" href="{{ asset('css/enhancements.css') }}">
+  {% if studio is defined %}
+  <link rel="stylesheet" href="/theme.css{% if preview %}?draft=true{% endif %}">{% endif %}
+  {% block scripts %}{% endblock %}
+</head>
+
+<body data-fallback-image="{{ c.fallback_image }}" class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  {% block body %}{% endblock %}
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Mi cuenta · Valerion{% endblock %}
+{% block scripts %}<script defer src="{{ asset('js/public.js') }}"></script><script defer src="{{ asset('js/account.js') }}"></script>{% endblock %}
+{% block body %}{% include 'public_header.html' %}
+<main id="main" class="wrap account-wrap"><p class="eyebrow">MI CUENTA</p><h1>Tu perfil</h1><p id="account-message" role="status" aria-live="polite">Cargando…</p>
+<div class="account-columns"><section class="account-card"><h2>Datos personales</h2><form id="profile-form"><label>Nombre<input name="nombre" required minlength="2" maxlength="100" autocomplete="name"></label><label>Correo electrónico<input name="email" readonly type="email"></label><label>Canal preferido<select name="canal_preferido"><option value="email">Correo</option><option value="telefono">Teléfono</option><option value="whatsapp">WhatsApp</option><option value="tienda">Tienda</option><option value="web">Web</option></select></label>
+<label class="check-label"><input name="preferencia_contacto" type="checkbox"> Deseo que me contacten con información de la marca.</label><p class="small muted">Puedes retirar esta preferencia cuando quieras. Guardarla no envía ningún mensaje.</p><fieldset><legend>Datos de entrega</legend>
+<label>Dirección<input name="direccion" autocomplete="street-address" maxlength="400"></label>
+<label>Código postal<input name="cp" autocomplete="postal-code" maxlength="5" pattern="[0-9]{5}" inputmode="numeric"></label>
+<label>Ciudad<input name="ciudad" autocomplete="address-level2" maxlength="120"></label>
+<label>Teléfono de entrega<input name="telefono" type="tel" autocomplete="tel" maxlength="25"></label>
+<details><summary>Coordenadas de entrega (opcionales)</summary><label>Latitud<input name="latitud" type="number" min="-90" max="90" step="any"></label>
+<label>Longitud<input name="longitud" type="number" min="-180" max="180" step="any"></label></details></fieldset>
+<button class="button" disabled>Guardar cambios</button></form></section>
+<section class="account-card"><h2>Seguridad</h2><form id="password-form"><label>Contraseña actual<input name="actual" type="password" required maxlength="256" autocomplete="current-password"></label><label>Nueva contraseña<input name="nueva" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></label><p class="small muted">Al cambiarla se cerrarán todas tus sesiones.</p><button class="button secondary" disabled>Cambiar contraseña</button></form><hr><button id="account-logout" class="text-link">Cerrar todas mis sesiones</button></section></div>
+<section class="account-card"><h2>Mis pedidos</h2><div id="order-history" aria-live="polite"></div><nav class="pagination" aria-label="Mis pedidos"><button class="button secondary" id="order-prev" disabled>Anterior</button><button class="button secondary" id="order-next" disabled>Siguiente</button></nav></section></main>{% include 'public_footer.html' %}{% endblock %}

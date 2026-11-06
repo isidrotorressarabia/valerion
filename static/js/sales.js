@@ -1,0 +1,54 @@
+'use strict';
+(() => {
+  let page = 1;
+  let csrf = '';
+  const byId = id => document.getElementById(id);
+  const status = byId('sales-status');
+  const states = {pendiente:'Pendiente', pagada:'Pagada', en_preparacion:'En preparación',
+                  enviada:'Enviada', entregada:'Entregada', cancelada:'Cancelada'};
+  function element(tag, text) {
+    const el = document.createElement(tag);
+    el.textContent = text;
+    return el;
+  }
+  function card(order) {
+    const box = element('article', '');
+    box.className = 'account-card';
+    box.append(element('h2', 'Pedido #' + order.id), element('p', order.producto || 'Producto histórico'),
+               element('p', Valerion.money(order.monto_centavos / 100)), element('p', [order.cliente,order.email].filter(Boolean).join(' · ')),
+               element('p', order.direccion_envio || 'Sin dirección registrada'));
+    const label = element('label', 'Estado del pedido');
+    const select = element('select','');
+    for (const [value, name] of Object.entries(states)) select.add(new Option(name, value));
+    select.value = order.estado;
+    label.append(select);
+    const save = element('button','Guardar estado');
+    save.className = 'button secondary';
+    save.onclick = async () => {
+      save.disabled = true;
+      try {
+        await Valerion.request('/api/admin/ordenes/'+order.id+'/estado', {method:'PUT',
+            headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({estado:select.value})});
+        await load();
+      } catch (error) {status.textContent = error.message;} finally {save.disabled = false;}
+    };
+    box.append(label,save);
+    return box;
+  }
+  async function load() {
+    byId('prev').disabled = byId('next').disabled = true;
+    try {
+      const data = await Valerion.request('/api/admin/ventas?page_size=20&page='+page);
+      byId('sales-list').replaceChildren(...data.orders.map(card));
+      byId('orders-count').textContent = data.metrics.orders;
+      byId('orders-amount').textContent = Valerion.money(data.metrics.amount_centavos / 100);
+      byId('active-count').textContent = data.metrics.customers;
+      byId('prev').disabled = page === 1;
+      byId('next').disabled = page*20 >= data.metrics.orders;
+      status.textContent = data.orders.length ? 'Página '+page : 'Aún no hay pedidos.';
+    } catch (error) {status.textContent = error.message; if(error.status === 401) location.assign('/admin/login');}
+  }
+  byId('prev').onclick = () => {page--; load();};
+  byId('next').onclick = () => {page++; load();};
+  Valerion.request('/api/auth/me').then(me => {csrf = me.csrf_token; return load();}).catch(error => {status.textContent=error.message;});
+})();

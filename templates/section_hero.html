@@ -1,0 +1,10 @@
+<section class="hero wrap" id="inicio" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="line"></span> {{ c.hero_eyebrow }}</p>
+      <h1 id="hero-title">{{ c.hero_title }}<br>{{ c.hero_title_second }} <em>{{ c.hero_title_em }}</em></h1>
+      <p class="hero-intro">{{ c.hero_intro }}</p>
+      <div class="hero-actions"><a class="button" href="#coleccion">{{ c.hero_cta }} <span aria-hidden="true">↗</span></a><a class="text-link" href="#esencia">{{ c.hero_link }}</a></div>
+      <div class="hero-foot"><span class="tiny-agave" aria-hidden="true">✳</span><p>{{ c.hero_origin }}<br><span>{{ c.hero_origin_desc }}</span></p></div>
+    </div>
+    <div class="hero-art"><img class="hero-scene" src="{{ c.hero_image }}" data-fallback alt="{{ c.hero_alt }}" fetchpriority="high" width="650" height="720"><span class="art-caption">{{ c.hero_caption }}</span><span class="art-side">{{ c.hero_side }}</span></div>
+  </section>

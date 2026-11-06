@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Ventas · Valerion{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block scripts %}<script defer src="{{ asset('js/sales.js') }}"></script>{% endblock %}
+{% block body %}
+<aside class="admin-sidebar"><a href="/" class="wordmark">VALERION<span>ADMINISTRACIÓN</span></a><a href="/admin">Catálogo</a><a href="/admin/ventas" aria-current="page">Ventas</a><a href="/admin/clientes">Clientes</a><a href="/admin/estudio">Diseño y contacto</a><a href="/admin/sistema">Sistema</a></aside>
+<main id="main" class="admin-main">
+<nav class="admin-mobile-nav" aria-label="Administración"><a href="/admin">Catálogo</a><a href="/admin/clientes">Clientes</a><a href="/admin/ventas" aria-current="page">Ventas</a></nav>
+<div class="admin-heading"><div><p class="eyebrow">PEDIDOS Y ENTREGA</p><h1>Ventas</h1></div></div>
+<div class="metrics"><article><p>Pedidos registrados</p><strong id="orders-count">—</strong></article><article><p>Importe de pedidos vigentes</p><strong id="orders-amount">—</strong></article><article><p>Clientes activos</p><strong id="active-count">—</strong></article></div>
+<p role="status" aria-live="polite" id="sales-status">Cargando pedidos…</p>
+<div id="sales-list" class="account-columns"></div>
+<nav class="pagination" aria-label="Pedidos"><button class="button secondary" id="prev" disabled>Anterior</button><button class="button secondary" id="next" disabled>Siguiente</button></nav>
+</main>{% endblock %}
