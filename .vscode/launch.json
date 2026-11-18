@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Valerion · abrir sitio (F5)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["main:app", "--host", "127.0.0.1", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "redirectOutput": true,
+      "justMyCode": true,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "Uvicorn running on (https?://\\S+)",
+        "uriFormat": "%s"
+      }
+    }
+  ]
+}

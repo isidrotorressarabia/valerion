@@ -1,0 +1,16 @@
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+data/*.db*
+data/*.sqlite*
+data/uploads/*
+!data/uploads/.gitkeep
+
+data/backups/
+*.zip
+
+.ruff_cache/
+*.log
+.env.*
+!.env.example

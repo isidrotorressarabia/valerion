@@ -1,0 +1,39 @@
+'use strict';
+(()=>{
+ let csrf='';const $=s=>document.querySelector(s),message=$('#account-message');
+ async function send(url,method,body){return Valerion.request(url,{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(body)});}
+ function formAction(form,action){form.addEventListener('submit',async e=>{e.preventDefault();const b=form.querySelector('button');b.disabled=true;message.textContent='Guardando…';try{await action(Object.fromEntries(new FormData(form)));}catch(e){message.textContent=e.message;if(e.status===401)location.assign('/cuenta/login');}finally{b.disabled=false;}});}
+ const access=$('#access-form');if(access){formAction(access,async data=>{await send('/api/clientes/'+(access.dataset.register==='true'?'registro':'login'),'POST',data);location.assign('/cuenta');});return;}
+ const profile=$('#profile-form');if(!profile)return;
+ formAction(profile,async data=>{await send('/api/clientes/perfil','PUT',{nombre:data.nombre,canal_preferido:data.canal_preferido,preferencia_contacto:profile.elements.preferencia_contacto.checked,direccion:data.direccion,cp:data.cp,ciudad:data.ciudad,telefono:data.telefono,latitud:data.latitud===''?null:Number(data.latitud),longitud:data.longitud===''?null:Number(data.longitud)});message.textContent='Perfil actualizado.';});
+ formAction($('#password-form'),async data=>{await send('/api/clientes/password','POST',data);location.assign('/cuenta/login');});
+ $('#account-logout').onclick=async()=>{try{await send('/api/clientes/logout','POST',{});location.assign('/cuenta/login');}catch(e){message.textContent=e.message;}};
+ let historyPage=1;
+ async function history() {
+   const host=$('#order-history');
+   try {
+     const data=await Valerion.request('/api/clientes/ordenes?page='+historyPage);
+     host.replaceChildren();
+     for(const order of data.items) {
+       const row=document.createElement('p');
+       row.textContent='#'+order.id+' · '+(order.producto||'Producto histórico')+' · '+Valerion.money(order.monto_centavos/100)+' · '+order.estado.replaceAll('_',' ')+' · '+new Date(order.creado_en).toLocaleDateString('es-MX');
+       const detail=document.createElement('details'),summary=document.createElement('summary');
+       summary.textContent=row.textContent;
+       detail.append(summary);
+       const delivery=order.entrega||{};
+       const address=document.createElement('p');
+       address.textContent='Entrega: '+(delivery.direccion_envio||[delivery.direccion,delivery.cp,delivery.ciudad,delivery.telefono].filter(Boolean).join(', ')||'Sin dirección histórica');
+       detail.append(address);
+       if(order.actualizado_en){const stamp=document.createElement('p');stamp.textContent='Última actualización: '+new Date(order.actualizado_en).toLocaleString('es-MX');detail.append(stamp);}
+       host.append(detail);
+     }
+     if(!data.items.length) host.textContent='Aún no tienes pedidos.';
+     $('#order-prev').disabled=historyPage===1; $('#order-next').disabled=!data.siguiente;
+   } catch(error) {host.textContent=error.message;}
+ }
+ $('#order-prev').onclick=()=>{historyPage--;history();};
+ $('#order-next').onclick=()=>{historyPage++;history();};
+ history();
+ (async()=>{try{const data=await Valerion.request('/api/clientes/me');csrf=data.csrf;for(const key of ['canal_preferido','direccion','cp','ciudad','telefono','latitud','longitud']) profile.elements[key].value=data[key]??'';
+ profile.elements.nombre.value=data.nombre;profile.elements.email.value=data.email;profile.elements.preferencia_contacto.checked=data.preferencia_contacto;document.querySelectorAll('form button').forEach(b=>b.disabled=false);message.textContent='Tus datos están disponibles.';}catch(e){message.textContent=e.message;if(e.status===401)location.assign('/cuenta/login');}})();
+})();

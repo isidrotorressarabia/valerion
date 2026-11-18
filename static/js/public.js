@@ -1,0 +1,10 @@
+'use strict';
+(()=>{
+const age=document.querySelector('#age-dialog');if(age){let confirmed=false;try{confirmed=sessionStorage.getItem('valerion_adult')==='yes';}catch(_){}if(!confirmed)age.showModal();age.addEventListener('cancel',e=>e.preventDefault());document.querySelector('#age-confirm').onclick=()=>{try{sessionStorage.setItem('valerion_adult','yes');}catch(_){}age.close();};document.querySelector('#age-decline').onclick=()=>{document.querySelector('#age-denied').hidden=false;};}
+const menu=document.querySelector('#menu-toggle'),nav=document.querySelector('#main-nav');if(menu){menu.onclick=()=>{const expanded=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(expanded));nav.classList.toggle('open',expanded);};nav.querySelectorAll('a').forEach(a=>a.onclick=()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');});}
+const main=document.querySelector('#gallery-main');if(main){const thumbs=Array.from(document.querySelectorAll('[data-gallery]'));let selected=0;
+ const choose=i=>{selected=(i+thumbs.length)%thumbs.length;const b=thumbs[selected];main.src=b.dataset.gallery;main.alt=b.dataset.alt;document.querySelector('#gallery-caption').textContent=b.dataset.caption;thumbs.forEach(t=>{t.classList.toggle('selected',t===b);t.setAttribute('aria-pressed',String(t===b));});const large=document.querySelector('#lightbox-image');large.src=main.src;large.alt=main.alt;};
+ thumbs.forEach((b,i)=>b.onclick=()=>choose(i));const lightbox=document.querySelector('#lightbox');document.querySelector('#zoom-product').onclick=()=>{choose(selected);lightbox.showModal();};lightbox.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();choose(selected+(e.key==='ArrowRight'?1:-1));}});
+ document.querySelector('#share-product').onclick=async()=>{try{if(navigator.share)await navigator.share({title:document.title,url:location.href});else{await navigator.clipboard.writeText(location.href);Valerion.toast('Enlace copiado.');}}catch(e){if(e.name!=='AbortError')Valerion.toast('Puedes copiar el enlace desde la barra del navegador.');}};
+}
+})();

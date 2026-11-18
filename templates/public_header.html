@@ -1,0 +1,6 @@
+{% if preview %}<div class="preview-banner">Vista previa del borrador · Solo tú puedes verla <a href="/admin/estudio">Volver al editor →</a></div>{% endif %}
+{% if c.announcement %}<div class="announcement">{{ c.announcement }}</div>{% endif %}
+<header class="site-header wrap"><a class="wordmark" href="/" aria-label="{{ c.brand_name }}, inicio"><img src="{{ c.logo_image }}" data-fallback alt="" width="32" height="36">{{ c.brand_name }}<span>{{ c.brand_type }}</span></a>
+<button id="menu-toggle" class="menu-toggle" aria-controls="main-nav" aria-expanded="false" aria-label="Abrir menú">☰</button>
+<nav id="main-nav" aria-label="Navegación principal">{% for s in sections %}{% if s.nav and (s.kind != 'contact' or has_contact) %}<a href="/{% if preview %}admin/preview{% endif %}#{{ s.id }}">{{ s.nav }}</a>{% endif %}{% endfor %}<a href="/cuenta">Mi cuenta</a></nav>
+</header>

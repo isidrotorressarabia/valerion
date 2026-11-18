@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block title %}{{ seo.title }}{% endblock %}
+{% block scripts %}<script defer src="{{ asset('js/catalog.js') }}"></script><script defer src="{{ asset('js/public.js') }}"></script>{% endblock %}
+{% block body %}{% include 'public_header.html' %}<main id="main">{% include 'section_catalog.html' %}</main>{% include 'public_footer.html' %}{% include 'age.html' %}{% endblock %}

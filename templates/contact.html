@@ -1,0 +1,7 @@
+{% if has_contact %}<section class="contact-section section wrap" id="contacto"><div><p class="eyebrow">CONTACTO / VALERION</p><h2>{{ contact.title }}</h2><p class="contact-intro">{{ contact.intro }}</p>{% if whatsapp %}<a class="button" href="{{ whatsapp }}" target="_blank" rel="noopener noreferrer">Escríbenos por WhatsApp ↗</a>{% endif %}</div><div class="contact-details">
+{% for email in contact.emails %}<div><span class="eyebrow">{{ email.label or 'Correo' }}</span><a href="mailto:{{ email.value }}">{{ email.value }}</a></div>{% endfor %}
+{% for phone in contact.phones %}<div><span class="eyebrow">{{ phone.label or 'Teléfono' }}</span><a href="tel:{{ phone.value|replace(' ','')|replace('(','')|replace(')','')|replace('-','') }}">{{ phone.value }}</a></div>{% endfor %}
+{% if contact.address %}<div><span class="eyebrow">ENCUÉNTRANOS</span><p class="preserve-lines">{{ contact.address }}</p></div>{% endif %}
+{% if contact.hours %}<div><span class="eyebrow">HORARIO DE ATENCIÓN</span><p class="preserve-lines">{{ contact.hours }}</p></div>{% endif %}
+{% if contact.socials %}<div><span class="eyebrow">SÍGUENOS</span><div class="social-links">{% for social in contact.socials %}<a href="{{ social.url }}" target="_blank" rel="noopener noreferrer">{{ social.platform }} ↗</a>{% endfor %}</div></div>{% endif %}
+</div></section>{% endif %}

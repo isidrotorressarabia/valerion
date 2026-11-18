@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} · {{ c.brand_name }}{% endblock %}
+{% block scripts %}<script defer src="{{ asset('js/public.js') }}"></script>{% endblock %}
+{% block body %}{% macro f(key, label) %}{% if L[key] %}{{ L[key] }}{% else %}<mark>[COMPLETAR: {{ label }}]</mark>{% endif %}{% endmacro %}
+{% include 'public_header.html' %}
+<main id="main" class="wrap account-wrap legal"><article class="account-card">
+<p class="eyebrow">INFORMACIÓN LEGAL</p><h1>{{ title }}</h1>
+<p class="small muted">Versión {{ version }} · Actualizado el {{ updated }}</p>
+{% if pending %}<p class="small"><mark>Borrador: faltan datos del responsable ({{ pending|join('; ') }}). Defínelos con las variables LEGAL_* antes de publicar.</mark></p>{% endif %}
+
+{% if page == 'privacidad' %}
+<h2>1. Responsable del tratamiento</h2>
+<p>{{ f('name','razón social o nombre del responsable') }}, con domicilio en {{ f('address','domicilio del responsable') }} (RFC: {{ f('rfc','RFC') }}), es responsable del tratamiento de tus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares. Contacto para asuntos de privacidad: {{ f('email','correo para solicitudes de privacidad') }}.</p>
+
+<h2>2. Datos personales que recabamos</h2>
+<ul>
+<li><strong>Identificación y contacto:</strong> nombre, correo electrónico y teléfono de entrega.</li>
+<li><strong>Entrega:</strong> domicilio, código postal, ciudad y, de forma opcional, coordenadas.</li>
+<li><strong>Cuenta:</strong> contraseña (solo guardamos una huella criptográfica, nunca la contraseña), preferencias y canal de contacto, historial y estado de tus pedidos.</li>
+<li><strong>Edad y aceptación:</strong> tu declaración de ser mayor de 18 años y la fecha y versión del aviso que aceptaste.</li>
+<li><strong>Pago:</strong> el cobro lo procesa Mercado Pago. No recibimos ni guardamos datos de tu tarjeta; solo el identificador y el estado del pago.</li>
+<li><strong>Técnicos:</strong> dirección IP y datos de conexión en bitácoras de seguridad y para limitar intentos de acceso.</li>
+</ul>
+<p>No recabamos datos personales sensibles.</p>
+
+<h2>3. Finalidades</h2>
+<p><strong>Necesarias</strong> (sin ellas no podemos darte el servicio): crear y administrar tu cuenta; verificar tu correo y recuperar tu contraseña; procesar pedidos, cobros, entregas y aclaraciones; enviarte correos del servicio (verificación, confirmación de pago, envío); verificar que eres mayor de edad; prevenir fraude y abusos; y cumplir obligaciones legales, fiscales y contables.</p>
+<p><strong>Opcional:</strong> enviarte información de la marca, solo si activas esa preferencia en Mi cuenta. Puedes retirarla cuando quieras, sin afectar tus compras.</p>
+
+<h2>4. Con quién compartimos tus datos</h2>
+<p>No vendemos tus datos. Compartimos solo lo indispensable con: Mercado Pago (cobro); la paquetería o mensajería que entrega tu pedido (nombre, domicilio y teléfono); proveedores que tratan datos por nuestra cuenta (alojamiento de la aplicación, base de datos y envío de correo); y autoridades cuando una ley lo exija.</p>
+
+<h2>5. Medidas de seguridad</h2>
+<p>Usamos conexiones cifradas (HTTPS), cifrado en reposo de los datos de entrega, contraseñas protegidas con una función de derivación, acceso restringido y bitácoras de auditoría.</p>
+
+<h2>6. Tus derechos (ARCO) y cómo ejercerlos</h2>
+<p>Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición, así como revocar tu consentimiento o limitar el uso de tus datos:</p>
+<ul>
+<li><strong>En línea, de inmediato:</strong> en <a href="/cuenta/privacidad">Mi cuenta › Privacidad</a> puedes descargar tus datos y eliminar tu cuenta; en <a href="/cuenta">Mi cuenta</a> puedes corregir tu perfil y tus preferencias de contacto.</li>
+<li><strong>Por correo:</strong> escribe a {{ f('email','correo para solicitudes de privacidad') }} con tu nombre, un medio para responderte, la descripción clara de lo que solicitas y copia de una identificación.</li>
+</ul>
+<p>Te responderemos en un máximo de 20 días hábiles y, si procede, lo haremos efectivo en 15 días hábiles más. El ejercicio de estos derechos es gratuito, salvo costos justificados de reproducción o envío.</p>
+<p><strong>Qué pasa al eliminar tu cuenta:</strong> anonimizamos tus datos personales y de entrega. Conservamos un registro del pedido sin datos de contacto (producto, monto y fechas) y las bitácoras de seguridad por el tiempo necesario para cumplir obligaciones fiscales, contables y de seguridad. No podemos eliminar la cuenta mientras tengas pedidos en proceso.</p>
+
+<h2>7. Cookies y tecnologías similares</h2>
+<p>Usamos únicamente cookies y almacenamiento técnicos, necesarios para mantener tu sesión, proteger formularios y recordar tu confirmación de edad durante la visita. No usamos cookies de publicidad ni de análisis de terceros; si eso cambia, actualizaremos este aviso antes.</p>
+
+<h2>8. Cambios a este aviso</h2>
+<p>Publicaremos cualquier cambio en esta página, con su fecha y versión. Si el cambio es sustancial, te lo comunicaremos por correo o al iniciar sesión.</p>
+
+<h2>9. Autoridad</h2>
+<p>Si consideras que tu derecho a la protección de datos fue vulnerado, puedes acudir a la Secretaría Anticorrupción y Buen Gobierno, autoridad en la materia.</p>
+
+{% elif page == 'terminos' %}
+<h2>1. Quiénes somos</h2>
+<p>Esta tienda es operada por {{ f('name','razón social o nombre del responsable') }}, con domicilio en {{ f('address','domicilio del responsable') }}. Contacto: {{ f('email','correo para solicitudes de privacidad') }}. Al comprar aceptas estos términos, el <a href="/privacidad">Aviso de Privacidad</a> y la política de <a href="/envios-devoluciones">envíos, cancelaciones y devoluciones</a>.</p>
+
+<h2>2. Venta solo a mayores de edad</h2>
+<p>Vendemos bebidas alcohólicas únicamente a personas de 18 años o más. Al registrarte y al comprar declaras ser mayor de edad. Podemos cancelar pedidos, solicitar una identificación oficial al entregar y negarnos a entregar a menores. <strong>El abuso en el consumo de este producto es nocivo para la salud. Consúmelo con responsabilidad.</strong></p>
+
+<h2>3. Tu cuenta</h2>
+<p>Debes dar datos verdaderos, verificar tu correo y cuidar tus credenciales. Podemos suspender cuentas con uso fraudulento o abusivo.</p>
+
+<h2>4. Productos y precios</h2>
+<p>Los precios están en pesos mexicanos (MXN). {{ f('prices','si los precios incluyen impuestos') }} Las fotografías son ilustrativas. El precio que se cobra es el mostrado al iniciar el pago. Si un producto no estuviera disponible después de tu compra, te lo avisaremos y te reembolsaremos el total.</p>
+
+<h2>5. Pago</h2>
+<p>El pago se procesa en Mercado Pago, con sus propios términos. Tu pedido queda confirmado cuando el pago es acreditado; los pagos en efectivo o por transferencia pueden tardar en reflejarse. No almacenamos datos de tu tarjeta.</p>
+
+<h2>6. Envíos, cancelaciones y devoluciones</h2>
+<p>Se rigen por la <a href="/envios-devoluciones">política de envíos, cancelaciones y devoluciones</a>.</p>
+
+<h2>7. Propiedad intelectual</h2>
+<p>Las marcas, textos e imágenes de este sitio pertenecen a su titular o se usan con autorización. No puedes reproducirlos sin permiso.</p>
+
+<h2>8. Responsabilidad</h2>
+<p>Haremos lo razonable para que la información del sitio sea exacta y esté disponible. Nada en estos términos limita los derechos irrenunciables que la ley te otorga como consumidor.</p>
+
+<h2>9. Ley aplicable y quejas</h2>
+<p>Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Para controversias, los tribunales competentes son los de {{ f('jurisdiction','ciudad y estado de los tribunales competentes') }}, sin perjuicio de tus derechos ante la Procuraduría Federal del Consumidor (PROFECO).</p>
+
+<h2>10. Cambios</h2>
+<p>Podemos actualizar estos términos; la versión vigente es la publicada aquí. Los pedidos ya pagados se rigen por la versión aceptada al comprarlos.</p>
+
+{% else %}
+<h2>Cobertura y costo de envío</h2>
+<p>Zonas de entrega: {{ f('coverage','zonas de entrega') }}. Costo de envío: {{ f('shipping','costo de envío') }}.</p>
+
+<h2>Tiempos</h2>
+<p>{{ f('lead_time','tiempos de preparación y entrega') }}</p>
+
+<h2>Seguimiento de tu pedido</h2>
+<p>Verás el estado en <a href="/cuenta">Mi cuenta</a> (pendiente, pagada, en preparación, enviada, entregada o cancelada) y te avisaremos por correo cuando confirmemos el pago y cuando el pedido sea enviado.</p>
+
+<h2>Recepción</h2>
+<p>La entrega se hace solo a personas mayores de 18 años y podemos pedir identificación oficial. Revisa el paquete al recibirlo y, si ves daños visibles, indícalo ante quien entrega.</p>
+
+<h2>Cancelaciones</h2>
+<p>Puedes pedir la cancelación antes de que el pedido sea enviado escribiendo a {{ f('email','correo para solicitudes de privacidad') }} con tu número de orden. Si ya pagaste, te reembolsaremos por el mismo medio de pago.</p>
+
+<h2>Producto dañado, incorrecto o incompleto</h2>
+<p>Avísanos en un plazo de {{ f('return_window','plazo para reportar daños o errores') }} desde la entrega, con tu número de orden y fotografías del producto y del empaque. Te ofreceremos reposición o reembolso. Por tratarse de bebidas alcohólicas, no aceptamos devoluciones de botellas abiertas ni por cambio de gusto, salvo que exista un defecto del producto.</p>
+
+<h2>Reembolsos</h2>
+<p>Se realizan por Mercado Pago al mismo medio de pago; el tiempo en que se refleje depende de tu banco o emisor.</p>
+
+<h2>Quejas</h2>
+<p>Escríbenos a {{ f('email','correo para solicitudes de privacidad') }}. También puedes acudir a la Procuraduría Federal del Consumidor (PROFECO).</p>
+{% endif %}
+</article></main>{% include 'public_footer.html' %}{% endblock %}

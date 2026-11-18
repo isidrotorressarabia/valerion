@@ -1,0 +1,9 @@
+<section id="{{ s.id }}" class="custom-section tone-{{ s.tone }} spacing-{{ s.spacing }} align-{{ s.align }}"><div class="wrap">
+{% if s.kind == 'image_text' %}<div class="custom-split image-{{ s.image_side }}">{% if s.image %}<img src="{{ s.image }}" data-fallback alt="{{ s.alt }}" loading="lazy" width="800" height="700">{% endif %}<div>{% endif %}
+{% if s.eyebrow %}<p class="eyebrow">{{ s.eyebrow }}</p>{% endif %}{% if s.title %}<h2>{{ s.title }}</h2>{% endif %}{% if s.text %}<div class="rich-text preserve-lines">{{ s.text }}</div>{% endif %}
+{% if s.kind == 'gallery' %}<div class="editorial-gallery">{% for item in s['items'] %}{% if item.image %}<figure><a href="{{ item.image }}" target="_blank" rel="noopener"><img data-fallback src="{{ item.image }}" alt="{{ item.alt or item.title }}" loading="lazy" width="700" height="700"></a><figcaption><strong>{{ item.title }}</strong> {{ item.text }}</figcaption></figure>{% endif %}{% endfor %}</div>{% endif %}
+{% if s.kind == 'cards' %}<div class="feature-cards">{% for item in s['items'] %}<article>{% if item.image %}<img src="{{ item.image }}" data-fallback alt="{{ item.alt }}" loading="lazy" width="600" height="400">{% endif %}<h3>{{ item.title }}</h3><p class="preserve-lines">{{ item.text }}</p></article>{% endfor %}</div>{% endif %}
+{% if s.kind == 'faq' %}<div class="faq-list">{% for item in s['items'] %}<details><summary>{{ item.title }}</summary><p class="preserve-lines">{{ item.text }}</p></details>{% endfor %}</div>{% endif %}
+{% if s.button_text and s.button_url %}<a class="button" href="{{ s.button_url }}" {% if s.button_url.startswith('https:') %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ s.button_text }} ↗</a>{% endif %}
+{% if s.kind == 'image_text' %}</div></div>{% endif %}
+</div></section>
