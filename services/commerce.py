@@ -414,17 +414,18 @@ def attach(app, templates, require_admin, require_write, current_session):
             data = app.state.vault.open(
                 f"ordenes:{order['id']}", order.pop("entrega_segura")
             )
+            partes = [
+                data.get("direccion"),
+                f"Col. {data['colonia']}" if data.get("colonia") else None,
+                f"C.P. {data['cp']}" if data.get("cp") else None,
+                data.get("ciudad"),
+                data.get("estado"),
+                f"Tel: {data['telefono']}" if data.get("telefono") else None,
+                f"Recibe: {data['recibe']}" if data.get("recibe") else None,
+                f"Ref: {data['referencias']}" if data.get("referencias") else None,
+            ]
             order["direccion_envio"] = data.get("direccion_envio") or ", ".join(
-                str(data[k])
-                for k in (
-                    "direccion",
-                    "cp",
-                    "ciudad",
-                    "telefono",
-                    "latitud",
-                    "longitud",
-                )
-                if data.get(k) not in (None, "")
+                str(p) for p in partes if p
             )
         return {
             "orders": orders,

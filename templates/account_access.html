@@ -1,14 +1,72 @@
 {% extends 'base.html' %}
+{% from 'icons.html' import ui_icon %}
 {% block title %}{{ 'Crear cuenta' if register else 'Iniciar sesión' }} · Valerion{% endblock %}
 {% block scripts %}<script defer src="{{ asset('js/public.js') }}"></script><script defer src="{{ asset('js/account.js') }}"></script>{% endblock %}
 {% block body %}{% include 'public_header.html' %}
-<main id="main" class="wrap account-wrap"><section class="account-card"><p class="eyebrow">TU ESPACIO VALERION</p><h1>{{ 'Crea tu cuenta' if register else 'Bienvenido de nuevo' }}</h1><p>Administra tu perfil y tus preferencias de contacto.</p>
-<form id="access-form" data-register="{{ 'true' if register else 'false' }}">
-{% if register %}<label>Nombre<input name="nombre" autocomplete="name" required minlength="2" maxlength="100"></label>{% endif %}
-<label>Correo electrónico<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
-<label>Contraseña<input name="password" type="password" autocomplete="{{ 'new-password' if register else 'current-password' }}" required minlength="{{ 12 if register else 1 }}" maxlength="256"></label>
-{% if register %}<p class="small muted">Utiliza al menos 12 caracteres. Puedes pegar una contraseña desde tu gestor.</p>
-<label class="check-label"><input name="mayor_edad" type="checkbox" required> Declaro ser mayor de 18 años.</label>
-<label class="check-label"><input name="acepto_aviso" type="checkbox" required> He leído y acepto el <a href="/privacidad" target="_blank" rel="noopener">Aviso de Privacidad</a> y los <a href="/terminos" target="_blank" rel="noopener">Términos y Condiciones</a>.</label>{% endif %}
-<button class="button">{{ 'Crear cuenta' if register else 'Entrar' }}</button><p id="account-message" role="status" aria-live="polite"></p>
-</form>{% if not register %}<p><a href="/cuenta/recuperar">¿Olvidaste tu contraseña?</a></p>{% endif %}<p><a href="{{ '/cuenta/login' if register else '/cuenta/registro' }}">{{ 'Ya tengo cuenta' if register else 'Crear una cuenta' }} →</a></p></section></main>{% include 'public_footer.html' %}{% endblock %}
+<main id="main" class="wrap account-wrap">
+  <section class="account-card {{ 'account-card-wide' if register else '' }}">
+    <p class="eyebrow">TU ESPACIO VALERION</p>
+    <h1>{{ 'Crea tu cuenta' if register else 'Bienvenido de nuevo' }}</h1>
+    <p>{{ 'Registra tu perfil y tus datos de entrega protegidos para agilizar tus pedidos.' if register else 'Administra tu perfil, pedidos y preferencias de contacto.' }}</p>
+    {% if register %}
+    <div class="security-badge" role="note">
+      {{ ui_icon('shield') }}
+      <div>
+        <strong>Protección criptográfica de datos personales</strong>
+        <p class="small muted">Tu dirección, teléfono y referencias se cifran con AES-256-GCM antes de guardarse. Nunca se almacenan en texto plano ni se comparten con terceros ajenos a tu entrega.</p>
+      </div>
+    </div>
+    {% endif %}
+    <form id="access-form" data-register="{{ 'true' if register else 'false' }}">
+      {% if register %}
+      <div class="form-grid-2">
+        <label>Nombre completo *<input name="nombre" autocomplete="name" required minlength="2" maxlength="100" placeholder="Ej. Alejandro Morales"></label>
+        <label>Teléfono de contacto<input name="telefono" type="tel" autocomplete="tel" maxlength="25" placeholder="Ej. +52 667 123 4567"></label>
+      </div>
+      {% endif %}
+      <div class="{{ 'form-grid-2' if register else '' }}">
+        <label>Correo electrónico *<input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="tu@correo.com"></label>
+        <label>Contraseña *<input name="password" id="access-password" type="password" autocomplete="{{ 'new-password' if register else 'current-password' }}" required minlength="{{ 12 if register else 1 }}" maxlength="256"></label>
+      </div>
+      {% if register %}
+      <div class="password-hint-row">
+        <p class="small muted">Mínimo 12 caracteres. Puedes usar una frase o tu gestor de contraseñas.</p>
+        <span id="password-strength" class="password-pill" aria-live="polite">Longitud mínima: 12</span>
+      </div>
+      <details class="shipping-onboarding" open>
+        <summary>{{ ui_icon('location') }} Dirección de envío (opcional ahora, necesaria al comprar)</summary>
+        <div class="shipping-fields">
+          <label>Calle y número (exterior e interior)<input name="direccion" autocomplete="street-address" maxlength="400" placeholder="Av. Álvaro Obregón 145, Int. 4"></label>
+          <div class="form-grid-2">
+            <label>Colonia o fraccionamiento<input name="colonia" maxlength="150" placeholder="Col. Centro"></label>
+            <label>Código postal (5 dígitos)<input name="cp" autocomplete="postal-code" maxlength="5" pattern="[0-9]{5}" inputmode="numeric" placeholder="80000"></label>
+          </div>
+          <div class="form-grid-2">
+            <label>Ciudad o municipio<input name="ciudad" autocomplete="address-level2" maxlength="120" placeholder="Culiacán"></label>
+            <label>Estado<input name="estado" autocomplete="address-level1" maxlength="80" placeholder="Sinaloa"></label>
+          </div>
+          <div class="form-grid-2">
+            <label>Persona autorizada para recibir (+18)<input name="recibe" maxlength="100" placeholder="Quien mostrará identificación oficial"></label>
+            <label>Canal preferido de seguimiento
+              <select name="canal_preferido">
+                <option value="whatsapp">WhatsApp</option>
+                <option value="email" selected>Correo electrónico</option>
+                <option value="telefono">Llamada telefónica</option>
+              </select>
+            </label>
+          </div>
+          <label>Referencias para el mensajero<input name="referencias" maxlength="300" placeholder="Entre calles, color de fachada o indicaciones de entrega"></label>
+        </div>
+      </details>
+      <label class="check-label"><input name="preferencia_contacto" type="checkbox"> Deseo recibir invitaciones a catas y lanzamientos de edición limitada (opcional).</label>
+      <label class="check-label"><input name="mayor_edad" type="checkbox" required> Declaro bajo protesta de decir verdad ser mayor de 18 años. *</label>
+      <label class="check-label"><input name="acepto_aviso" type="checkbox" required> He leído y acepto el <a href="/privacidad" target="_blank" rel="noopener">Aviso de Privacidad</a> y los <a href="/terminos" target="_blank" rel="noopener">Términos y Condiciones</a>. *</label>
+      {% endif %}
+      <button class="button">{{ 'Crear cuenta segura' if register else 'Entrar' }}</button>
+      <p id="account-message" role="status" aria-live="polite"></p>
+    </form>
+    {% if not register %}<p><a href="/cuenta/recuperar">¿Olvidaste tu contraseña?</a></p>{% endif %}
+    <p><a href="{{ '/cuenta/login' if register else '/cuenta/registro' }}">{{ 'Ya tengo cuenta' if register else 'Crear una cuenta' }} →</a></p>
+  </section>
+</main>
+{% include 'public_footer.html' %}{% endblock %}

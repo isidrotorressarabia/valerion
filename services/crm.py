@@ -14,18 +14,31 @@ class DeliveryUpdate(BaseModel):
         extra="forbid", str_strip_whitespace=True, allow_inf_nan=False
     )
     direccion: str | None = Field(None, max_length=400)
-    ciudad: str | None = Field(None, max_length=120)
+    colonia: str | None = Field(None, max_length=150)
     cp: str | None = Field(None, pattern=r"^([0-9]{5})?$")
+    ciudad: str | None = Field(None, max_length=120)
+    estado: str | None = Field(None, max_length=80)
+    referencias: str | None = Field(None, max_length=300)
+    recibe: str | None = Field(None, max_length=100)
     telefono: str | None = Field(None, pattern=r"^(\+?[0-9 ()-]{7,25})?$")
     latitud: float | None = Field(None, ge=-90, le=90)
     longitud: float | None = Field(None, ge=-180, le=180)
 
-    @field_validator("direccion", "ciudad", "telefono")
+    @field_validator(
+        "direccion", "colonia", "ciudad", "estado", "referencias", "recibe", "telefono"
+    )
     @classmethod
     def clean(cls, value: str | None) -> str | None:
+        if value is not None and value == "":
+            return None
         if value and any(not c.isprintable() for c in value):
             raise ValueError("El campo contiene caracteres de control.")
         return value
+
+    @field_validator("cp")
+    @classmethod
+    def clean_cp(cls, value: str | None) -> str | None:
+        return None if value == "" else value
 
     @field_validator("telefono")
     @classmethod
@@ -62,7 +75,11 @@ def save_profile(app: FastAPI, customer_id: int, body) -> None:
         changed = []
         for key in FIELDS:
             if key in body.model_fields_set and shipping.get(key) != getattr(body, key):
-                shipping[key] = getattr(body, key)
+                val = getattr(body, key)
+                if val is None:
+                    shipping.pop(key, None)
+                else:
+                    shipping[key] = val
                 changed.append(key)
         envelope = (
             app.state.vault.seal(binding, shipping)

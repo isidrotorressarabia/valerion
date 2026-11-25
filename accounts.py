@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse,RedirectResponse
 from pydantic import BaseModel,ConfigDict,Field,field_validator
 from infrastructure import database,audit
 from services.crm import DeliveryUpdate, Channel, save_profile
-from services.logistics import event
+from services.logistics import FIELDS as DELIVERY_FIELDS, event
 from services import mail
 from services.legal import LEGAL_VERSION
 
@@ -35,16 +35,47 @@ class Login(Model):
         v=v.strip().lower()
         if not re.fullmatch(r'[a-z0-9.!#$%&\x27*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,63}',v):raise ValueError('Correo inválido.')
         return v
-class Register(Login):
+class Register(Model):
     nombre:str=Field(min_length=2,max_length=100)
+    email:str=Field(max_length=254)
     password:str=Field(min_length=12,max_length=256)
     acepto_aviso:bool|str|None=None
     mayor_edad:bool|str|None=None
+    preferencia_contacto:bool|str|None=None
+    canal_preferido:Channel='email'
+    direccion:str|None=Field(None,max_length=400)
+    colonia:str|None=Field(None,max_length=150)
+    cp:str|None=Field(None,max_length=5)
+    ciudad:str|None=Field(None,max_length=120)
+    estado:str|None=Field(None,max_length=80)
+    referencias:str|None=Field(None,max_length=300)
+    recibe:str|None=Field(None,max_length=100)
+    telefono:str|None=Field(None,max_length=25)
+    _email=field_validator('email')(Login.email_valid.__func__)
     @field_validator('nombre')
     @classmethod
     def name_valid(cls,v):
         v=v.strip()
         if len(v)<2 or any(ord(c)<32 for c in v):raise ValueError('Nombre inválido.')
+        return v
+    @field_validator('direccion','colonia','cp','ciudad','estado','referencias','recibe','telefono')
+    @classmethod
+    def strip_optional(cls,v):
+        if v is None:return None
+        v=v.strip()
+        if not v:return None
+        if any(not c.isprintable() for c in v):raise ValueError('El campo contiene caracteres inválidos.')
+        return v
+    @field_validator('cp')
+    @classmethod
+    def cp_valid(cls,v):
+        if v and not re.fullmatch(r'[0-9]{5}',v):raise ValueError('El código postal debe tener 5 dígitos.')
+        return v
+    @field_validator('telefono')
+    @classmethod
+    def phone_valid(cls,v):
+        if v and (not re.fullmatch(r'\+?[0-9 ()-]{7,25}',v) or not 7<=sum(ch.isdigit() for ch in v)<=15):
+            raise ValueError('Revisa el número de teléfono.')
         return v
 class Profile(DeliveryUpdate):
     canal_preferido: Channel | None = None
@@ -102,7 +133,7 @@ def migrate(cursor):
       CREATE TABLE IF NOT EXISTS cliente_tokens(token_hash TEXT PRIMARY KEY,
         cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,proposito TEXT NOT NULL,expires BIGINT NOT NULL);
       CREATE INDEX IF NOT EXISTS cliente_tokens_owner ON cliente_tokens(cliente_id,proposito);''')
-    if first_verification:  # cuentas previas a la verificación: se consideran verificadas
+    if first_verification:
         cursor.execute('UPDATE clientes SET email_verificado_en=now() WHERE email_verificado_en IS NULL')
 
 def current(request):
@@ -153,7 +184,7 @@ def attach(app,templates,page_context,require_admin,require_write):
     def access_page(request:Request):
         return templates.TemplateResponse(request=request,name='account_access.html',context={**page_context(),'register':request.url.path.endswith('registro')})
 
-    def send_link(email,nombre,token,path,subject,text):
+    def send_link(email,nombre,token,path,text,subject):
         mail.send_plain(app,email,subject,f"Hola {nombre},\n\n{text}\n\n{app.state.settings.origin}{path}#t={token}\n\nSi no fuiste tú, ignora este mensaje.\n\nValerion")
 
     @app.post('/api/clientes/registro',status_code=201)
@@ -162,17 +193,25 @@ def attach(app,templates,page_context,require_admin,require_write):
         consent=truthy(body.acepto_aviso) and truthy(body.mayor_edad)
         if app.state.settings.consent_required and not consent:
             raise HTTPException(422,'Debes aceptar el Aviso de Privacidad y declarar que eres mayor de 18 años.')
+        opt_in=truthy(body.preferencia_contacto)
+        shipping={k:getattr(body,k) for k in ('direccion','colonia','cp','ciudad','estado','referencias','recibe','telefono') if getattr(body,k)}
         salt,pw=password_pair(body.password)
         verify=None
         with database(app) as (_,cur):
-            cur.execute('''INSERT INTO clientes(nombre,email,password_salt,password_hash,creado_en,ultimo_acceso,aceptacion_legal_en,version_legal,mayor_edad_declarada)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(email) DO NOTHING RETURNING id''',(body.nombre,body.email,salt,pw,stamp(),stamp(),datetime.now(timezone.utc) if consent else None,LEGAL_VERSION if consent else None,consent))
+            cur.execute('''INSERT INTO clientes(nombre,email,password_salt,password_hash,creado_en,ultimo_acceso,preferencia_contacto,canal_preferido,aceptacion_legal_en,version_legal,mayor_edad_declarada)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(email) DO NOTHING RETURNING id''',
+                (body.nombre,body.email,salt,pw,stamp(),stamp(),opt_in,body.canal_preferido,datetime.now(timezone.utc) if consent else None,LEGAL_VERSION if consent else None,consent))
             row=cur.fetchone()
             if not row:raise HTTPException(409,'No se pudo crear la cuenta con esos datos. Si ya tienes una cuenta, inicia sesión.')
-            event(cur,row['id'],None,'cuenta.creada',f"cliente:{row['id']}")
-            audit(cur,'account.register',str(row['id']),'customer')
-            if mail.configured(app):verify=issue_token(cur,row['id'],'verificar',3*86400)
-            result=session(cur,app,response,row['id'])
+            cid=row['id']
+            if shipping:
+                envelope=app.state.vault.seal(f"clientes:{cid}",shipping)
+                cur.execute('UPDATE clientes SET entrega_segura=%s WHERE id=%s',(envelope,cid))
+                event(cur,cid,None,'entrega.modificada',f"cliente:{cid}",campos=sorted(shipping.keys()))
+            event(cur,cid,None,'cuenta.creada',f"cliente:{cid}")
+            audit(cur,'account.register',str(cid),'customer')
+            if mail.configured(app):verify=issue_token(cur,cid,'verificar',3*86400)
+            result=session(cur,app,response,cid)
         if verify:background_tasks.add_task(send_link,body.email,body.nombre,verify,'/cuenta/verificar','Verifica tu correo para poder comprar. El enlace vence en 3 días:','Valerion · Verifica tu correo')
         return result
 
@@ -228,7 +267,7 @@ def attach(app,templates,page_context,require_admin,require_write):
             cur.execute('SELECT id,producto_nombre,monto_centavos,estado,creado_en,actualizado_en,entrega_segura FROM ordenes WHERE cliente_id=%s ORDER BY id',(user['id'],));orders=cur.fetchall()
         for order in orders:
             sealed=order.pop('entrega_segura');order['entrega']=app.state.vault.open(f"ordenes:{order['id']}",sealed) if sealed else {}
-        delivery={k:user.get(k) for k in ('direccion','cp','ciudad','telefono','latitud','longitud')}
+        delivery={k:user.get(k) for k in DELIVERY_FIELDS}
         return JSONResponse(jsonable_encoder({'perfil':profile,'entrega':delivery,'pedidos':orders}),headers={'Content-Disposition':'attachment; filename="mis-datos-valerion.json"'})
 
     @app.delete('/api/clientes/me')

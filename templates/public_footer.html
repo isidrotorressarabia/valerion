@@ -1,2 +1,17 @@
-<footer class="site-footer wrap"><div><a class="wordmark footer-mark" href="/">{{ c.brand_name }}</a><p>{{ c.footer_tagline }}</p></div><div class="footer-links">{% for social in contact.socials %}<a href="{{ social.url }}" target="_blank" rel="noopener noreferrer">{{ social.platform }} ↗</a>{% endfor %}{% if has_contact %}<a href="/#contacto">Contacto</a>{% endif %}</div><div class="footer-bottom"><span>© {{ year }} {{ c.footer_copyright }}</span><span>{{ c.footer_responsible }}</span><nav aria-label="Información legal"><a href="/privacidad">Privacidad</a> · <a href="/terminos">Términos</a> · <a href="/envios-devoluciones">Envíos y devoluciones</a></nav></div></footer>
-{% if whatsapp and contact.floating_whatsapp %}<a class="whatsapp-float" href="{{ whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="Conversar por WhatsApp">WhatsApp ↗</a>{% endif %}
+{% from 'icons.html' import social_icon, ui_icon %}
+<footer class="site-footer wrap">
+  <div><a class="wordmark footer-mark" href="/">{{ c.brand_name }}</a><p>{{ c.footer_tagline }}</p></div>
+  <div class="footer-links">
+    {% for social in contact.socials %}
+    <a class="footer-social-link" href="{{ social.url }}" target="_blank" rel="noopener noreferrer">{{ social_icon(social.platform) }}<span>{{ social.platform }}</span></a>
+    {% endfor %}
+    {% if has_contact %}<a class="footer-social-link" href="/#contacto">{{ ui_icon('mail') }}<span>Contacto</span></a>{% endif %}
+  </div>
+  <div class="footer-bottom">
+    <span>© {{ year }} {{ c.footer_copyright }}</span><span>{{ c.footer_responsible }}</span>
+    <nav aria-label="Información legal"><a href="/privacidad">Privacidad</a> · <a href="/terminos">Términos</a> · <a href="/envios-devoluciones">Envíos y devoluciones</a></nav>
+  </div>
+</footer>
+{% if whatsapp and contact.floating_whatsapp %}
+<a class="whatsapp-float" href="{{ whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="Conversar por WhatsApp">{{ social_icon('whatsapp') }}<span>WhatsApp</span></a>
+{% endif %}

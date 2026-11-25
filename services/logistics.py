@@ -4,7 +4,24 @@ from decimal import Decimal
 from psycopg import Cursor, sql
 from services.privacy import DeliveryVault
 
-FIELDS = ("direccion", "cp", "ciudad", "telefono", "latitud", "longitud")
+"""Transactional upgrade for legacy order/profile records and delivery history."""
+
+from decimal import Decimal
+from psycopg import Cursor, sql
+from services.privacy import DeliveryVault
+
+FIELDS = (
+    "direccion",
+    "colonia",
+    "cp",
+    "ciudad",
+    "estado",
+    "referencias",
+    "recibe",
+    "telefono",
+    "latitud",
+    "longitud",
+)
 
 
 def _import_columns(
